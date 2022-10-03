@@ -1,1 +1,216 @@
+Codeforces Contest - Codeforces Round #824 (Div. 2) Solutions
 
+Problem A - https://codeforces.com/contest/1735/problem/A
+
+Idea - 
+
+For maximizing the minimum segments it is obvious to take one segment of length 1 so that its difference with any other becomes maximum. So take a day off at Day 2. Now there are two days off at Day n and Day 2. We need to find another day such that the length of segments between them is maximum. By taking a Day off at 1/3rd the distance from 2, you'll maximize the difference of length of segments. 
+
+Code - 
+
+#include <bits/stdc++.h>
+using namespace std;
+
+#define nl "\n"
+#define ll long long int
+#define INF 1e9
+
+void solve()
+{
+    int n;
+    cin >> n;
+    int points[3] = {2, (n - 2) / 3 + ((n - 2) % 3 > 0) + 2, n};
+    int segments[3] = {1, points[1] - points[0] - 1, points[2] - points[1] - 1};
+    cout << min({abs(segments[0] - segments[1]), abs(segments[1] - segments[2]), abs(segments[2] - segments[0])}) << nl;
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    int T = 1;
+    cin >> T;
+    for (int t = 1; t <= T; t++)
+    {
+        solve();
+    }
+}
+
+Problem B - https://codeforces.com/contest/1735/problem/B
+
+Idea - 
+
+It is obvious that we have to consider the smallest element always since it can not become larger to meet the problem's description. Now we need to make rest of all the elements strictly less than twice. We know the largest number that can satisfy our contraints would be "2 * smallest_element - 1". Let's call this number X. So idea was to make all the elements smaller or equal to that number but larger or equal to the smallest_element (This was my thinking, the problem constraints required that for every pair the bigger number is strictly less than twice of the smaller number). Now if I divide the current element by X and adding 1 if there is a remainder it'll give me smallest factor of X larger or equal to current element. The remainder can then be simply distributed among these elements leading to a possible solution. 
+
+Code - 
+
+#include <bits/stdc++.h>
+using namespace std;
+
+#define nl "\n"
+#define ll long long int
+#define INF 1e9
+
+void solve()
+{
+    int n;
+    cin >> n;
+    int a[n];
+    for (int &x : a)
+        cin >> x;
+    ll minVal = 2 * a[0] - 1, ans = 0;
+    for (int &x : a)
+        ans += x / minVal + (x % minVal > 0) - 1;
+    cout << ans << nl;
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    int T = 1;
+    cin >> T;
+    for (int t = 1; t <= T; t++)
+    {
+        solve();
+    }
+}
+
+Problem C - https://codeforces.com/contest/1735/problem/C
+
+Idea - 
+
+It is obvious that we want each character of the string to be preceded by the smallest possible character to give the lexographically smallest string. The problem with this was there if we proceed this way only there may be configuration of characters such that they create a cycle of length less than 26. So to fix this, we'll just check if adding the smallest unassigned character is leading to a cycle or not by simply performing a dfs in reverse direction and returning whether we are reaching the current smallest character or not. If yes, skip to next character otherwise assign it to current character. We'll do this until we have assigned 25 characters and only 1 character is remaining which will complete our cycle of 26 characters.
+
+Code - 
+
+#include <bits/stdc++.h>
+using namespace std;
+
+#define nl "\n"
+#define ll long long int
+#define INF 1e9
+
+bool dfs(char curr, const char &target, const vector<int> &v)
+{
+    if (curr == target)
+        return true;
+    if (v[curr - 'a'] == -1)
+        return false;
+    return dfs(v[curr - 'a'] + 'a', target, v);
+}
+
+void solve()
+{
+    int n;
+    cin >> n;
+    string s;
+    cin >> s;
+    set<char> st;
+    for (int i = 0; i < 26; i++)
+        st.insert('a' + i);
+    vector<int> v(26, -1);
+    for (int i = 0; i < n; i++)
+    {
+        if (v[s[i] - 'a'] != -1)
+            continue;
+        char c;
+        for (auto &x : st)
+            if (st.size() == 1 || !dfs(x, s[i], v))
+            {
+                c = x;
+                break;
+            }
+        v[s[i] - 'a'] = c - 'a';
+        st.erase(c);
+    }
+    for (int i = 0; i < n; i++)
+        cout << char(v[s[i] - 'a'] + 'a');
+    cout << nl;
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    int T = 1;
+    cin >> T;
+    for (int t = 1; t <= T; t++)
+    {
+        solve();
+    }
+}
+
+Problem D - https://codeforces.com/contest/1735/problem/D
+
+Idea - 
+
+The idea was to find for each pair of cards present on the table, the other card that will complete the set. If it is present on the table, just incremenet the count of sets formed by taking that card by 1. Then it is a simple combinatorics problem of selecting 2 out of available sets by simply calculating count_of_sets*(count_of_sets-1)/2.
+
+Code - 
+
+#include <bits/stdc++.h>
+using namespace std;
+
+#define nl "\n"
+#define ll long long int
+#define INF 1e9
+
+long long power(long long num, long long pw)
+{
+    ll res = 1;
+    while (pw)
+    {
+        if (pw & 1)
+            res *= num;
+        num *= num;
+        pw /= 2;
+    }
+    return res;
+}
+
+void solve()
+{
+    int n, k;
+    cin >> n >> k;
+    vector<vector<int>> a(n, vector<int>(k));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < k; j++)
+            cin >> a[i][j];
+    map<ll, ll> mp;
+    for (int i = 0; i < n; i++)
+    {
+        ll num = 0;
+        for (int j = 0; j < k; j++)
+            num += a[i][j] * power(3, j);
+        mp[num] = 0;
+    }
+    for (int i = 0; i < n; i++)
+        for (int j = i + 1; j < n; j++)
+        {
+            ll sum = 0;
+            for (int l = 0; l < k; l++)
+                if (a[i][l] == a[j][l])
+                    sum += a[i][l] * power(3, l);
+                else
+                    sum += (3 - a[i][l] - a[j][l]) * power(3, l);
+            if (mp.count(sum))
+                mp[sum]++;
+        }
+
+    ll ans = 0;
+    for (auto &x : mp)
+        ans += x.second * (x.second - 1) / 2;
+    cout << ans << nl;
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    int T = 1;
+    for (int t = 1; t <= T; t++)
+    {
+        solve();
+    }
+}
