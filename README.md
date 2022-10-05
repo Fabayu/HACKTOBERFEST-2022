@@ -6,4 +6,9 @@
 <b>(◔◡◔)&nbsp;
 
 
-<img src="https://github.com/CODING-Enthusiast9857/It-is-For-Everyone/blob/main/Hacktoberfest.png" alt="Hacktoberfest2022" width=100%>
+
+<a href="https://github.com/Fabayu/HACKTOBERFEST-2022/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Fabayu/HACKTOBERFEST-2022" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
