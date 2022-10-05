@@ -12,13 +12,11 @@ void bfs(vector<vector<int>> &graph, int source, vector<bool> &vis)
         q.pop();
         cout << curr << " ";
         for (int neigh : graph[curr])
-        {
             if (!vis[neigh])
             {
                 q.push(neigh);
                 vis[neigh] = true;
             }
-        }
     }
 }
 

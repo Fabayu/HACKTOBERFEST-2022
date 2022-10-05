@@ -6,10 +6,8 @@ void dfs(vector<vector<int>> &graph, int source, vector<bool> &vis)
     cout << source << " ";
     vis[source] = true;
     for (int neigh : graph[source])
-    {
         if (!vis[neigh])
             dfs(graph, neigh, vis);
-    }
 }
 
 int main()

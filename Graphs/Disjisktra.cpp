@@ -32,9 +32,7 @@ void dijisktra(vector<vector<pair<int, int>>> &adj, int source)
         }
     }
     for (int i = 0; i < n; i++)
-    {
-        cout << "distance from " << source << " to " << i << " is : - > " << dis[i] << endl;
-    }
+        cout << "distance from " << source << " to  " << i << " is : - > " << dis[i] << endl;
 }
 int main()
 {

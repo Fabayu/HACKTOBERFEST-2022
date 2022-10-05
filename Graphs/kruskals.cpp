@@ -10,7 +10,7 @@
 // Take the edge with the lowest weight and add it to the spanning tree. If adding the edge created a cycle, then reject this edge.
 // Keep adding edges until we reach all vertices.
 
-// Any minimum spanning tree algorithm revolves around checking if adding an edge creates a loop or not.
+// Any minimum spanning tree algorithm revolves around checking if adding an edge  creates a loop or not.
 #include <bits/stdc++.h>
 using namespace std;
 #define edge pair<int, int>
