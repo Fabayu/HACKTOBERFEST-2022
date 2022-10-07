@@ -72,7 +72,40 @@ CPP
         return op;
         
     }
-
+    
+ ------------------------------------------------------------------------------------------------------------
+ Problem 5:
+ Link : https://leetcode.com/problems/maximum-subarray/
+ solution 
+ CPP    
+  int maxSubArray(vector<int>& nums) {
+        int maxSum=nums[0];
+        int sum=0;
+        int n=nums.size();
+        for(int i=0;i<n;i++){
+            sum+=nums[i];
+            maxSum=max(maxSum,sum);
+            if(sum<0)
+                sum=0;
+        }
+        return maxSum;
+    }
+    
+------------------------------------------------------------------------------------------------------------
+ Problem 6:
+ Link : https://leetcode.com/problems/rotate-array/
+ solution 
+ CPP      
+     void rotate(vector<int>& nums, int k) {
+        int n=nums.size();
+        vector<int> v(n);
+        for(int i=0;i<n;i++){
+            v[(i+k)%n]=nums[i];
+        }
+        for(int i=0;i<n;i++){
+            nums[i]=v[i];
+        }
+      }
 
 
 
