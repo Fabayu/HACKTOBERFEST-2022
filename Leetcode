@@ -109,6 +109,44 @@ CPP
 
 
 
+---------------------------------------------------------------------------------------------------------------
+Problem 704:
+link : https://leetcode.com/problems/binary-search/
+solution 
+C
+
+
+
+int search(int* nums, int numsSize, int target){
+     if (numsSize == 1 && nums[0] == target)
+        return 0;
+    
+    int min , max , mid ;
+    min=0;
+    max=numsSize-1;
+    
+    while(min<=max)
+    {   mid=(min+max)/2;
+        if(nums[mid]==target)
+        {   
+            // printf("%d",target);
+            return mid;
+           
+        }
+        else if(target > nums[mid])
+        {
+            min=mid+1;
+        }
+        else
+        {
+            max=mid-1;
+        }
+    }
+    return -1;
+}
+
+
+
 
 
 
