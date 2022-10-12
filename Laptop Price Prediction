@@ -1,0 +1,305 @@
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+import pickle
+import warnings
+warnings.filterwarnings("ignore")
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+from sklearn.linear_model import LinearRegression,Ridge,Lasso
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor,GradientBoostingRegressor,AdaBoostRegressor,ExtraTreesRegressor
+from sklearn.svm import SVR
+
+df=pd.read_csv('laptop_data.csv')
+df.head()
+
+df.shape
+
+df.info()
+
+df.isnull().sum()
+
+df.duplicated().sum()
+
+df.drop('Unnamed: 0',axis=1,inplace=True)
+
+df.head()
+
+df['Ram'] = df['Ram'].str.replace('GB','')
+df['Weight'] = df['Weight'].str.replace('kg','')
+
+df.head()
+
+print(df['Ram'].dtype)
+print(df['Weight'].dtype)
+
+df['Ram']=df['Ram'].astype('int32')
+df['Weight']=df['Weight'].astype('float32')
+
+sns.barplot(df['Ram'],df['Price'])
+plt.show()
+# By change in Ram size, the price varies
+
+df.info()
+
+df['Company'].value_counts().plot(kind='bar')
+plt.show()
+# Mostly we have laptop of dell, lenovo and hp
+
+sns.barplot(x=df['Company'],y=df['Price'])
+plt.xticks(rotation='vertical')
+plt.show()
+# Razer have most expensive laptops
+# laptop price alse depends upon what type of company we choose
+
+df['TypeName'].value_counts().plot(kind='bar')
+plt.show()
+# Mostly we have notebook laptops
+
+sns.barplot(x=df['TypeName'],y=df['Price'])
+plt.xticks(rotation='vertical')
+plt.show()
+# Workstation type laptops are most expensive
+# laptop price also depends upon on type of laptop
+
+sns.distplot(df['Inches'])
+plt.show()
+# Mostly laptops are of 16 inches
+
+sns.scatterplot(df['Inches'],df['Price'])
+plt.show()
+# With the increase in icnhes, laptop prices also increases
+
+df['ScreenResolution'].value_counts()
+
+df['Ips']=df['ScreenResolution'].apply(lambda x:1 if 'IPS Panel' in x else 0)
+
+df['Ips'].value_counts().plot(kind='bar')
+plt.show()
+# Mostly laptops have no IPS Panel
+
+sns.barplot(df['Ips'],df['Price'])
+plt.show()
+# IPS Panel laptops have high price
+
+df['Touchscreen']=df['ScreenResolution'].apply(lambda x:1 if 'Touchscreen' in x else 0)
+
+df['Touchscreen'].value_counts().plot(kind='bar')
+plt.show()
+# Mostly laptops have no touchscreen
+
+sns.barplot(df['Touchscreen'],df['Price'])
+plt.show()
+# Touch Screen laptops have high price
+
+res=df['ScreenResolution'].str.split('x')
+
+df['X_res']=0
+df['Y_res']=0
+for i in range(len(res)):
+    df['Y_res'][i]=res[i][1]
+    df['X_res'][i]=res[i][0][-4:]
+
+df.head()
+
+df['X_res']=df['X_res'].astype('int32')
+df['Y_res']=df['Y_res'].astype('int32')
+
+sns.distplot(df['Y_res'])
+plt.show()
+
+sns.barplot(x=df['Y_res'],y=df['Price'])
+plt.show()
+
+sns.distplot(df['X_res'])
+plt.show()
+
+sns.barplot(x=df['X_res'],y=df['Price'])
+plt.xticks(rotation='vertical')
+plt.show()
+
+df.corr()['Price']
+
+df['ppi'] = (((df['X_res']**2) + (df['Y_res']**2))**0.5)/df['Inches'].astype('float')
+df.corr()['Price']
+# Having strong corelation of ppi with price
+
+df.drop(['ScreenResolution','X_res','Y_res','Inches'],axis=1,inplace=True)
+
+df.head()
+
+df['Cpu Brand']=df['Cpu']
+for i,j in zip(range(len(df['Cpu'])),df['Cpu']):
+    if 'Intel Core i3' in j:
+        df['Cpu Brand'][i]='Intel Core i3'
+    elif 'Intel Core i5' in j:
+        df['Cpu Brand'][i]='Intel Core i5'
+    elif 'Intel Core i7' in j:
+        df['Cpu Brand'][i]='Intel Core i7'
+    elif 'AMD' in j:
+        df['Cpu Brand'][i]='AMD'
+    else:
+        df['Cpu Brand'][i]='Other Processor'
+
+df['Cpu Brand'].value_counts().plot(kind='bar')
+plt.show()
+
+sns.barplot(x=df['Cpu Brand'],y=df['Price'])
+plt.xticks(rotation='vertical')
+plt.show()
+
+df.drop('Cpu',axis=1,inplace=True)
+
+sns.distplot(df['Ram'])
+plt.show()
+
+sns.barplot(x=df['Ram'],y=df['Price'])
+plt.xticks(rotation='vertical')
+plt.show()
+
+df['Memory'].value_counts()
+
+df['SSD']=0
+df['HDD']=0
+df['Hybrid']=0
+df['Flash Storage']=0
+df['Memory']=df['Memory'].str.replace('1TB','1000GB')
+df['Memory']=df['Memory'].str.replace('1.0TB','1000GB')
+df['Memory']=df['Memory'].str.replace('2.0TB','2000GB')
+df['Memory']=df['Memory'].str.replace('2TB','2000GB')
+for i in range(len(df)):
+    a=df['Memory'][i].split('+')
+    b=a[0].split('GB')
+    if 'SSD' in a[0]:
+        df['SSD'][i]=b[0]
+    elif 'HDD' in a[0]:
+        df['HDD'][i]=b[0]
+    elif 'Hybrid' in a[0]:
+        df['Hybrid'][i]=b[0]
+    elif 'Flash Storage' in a[0]:
+        df['Flash Storage'][i]=b[0]
+    if '+'in df['Memory'][i]:
+        c=a[1].split('GB')
+        if 'SSD' in a[1]:
+            df['SSD'][i]=int(df['SSD'][i])+int(c[0])
+        elif 'HDD' in a[1]:
+            df['HDD'][i]=int(df['HDD'][i])+int(c[0])
+        elif 'Hybrid' in a[1]:
+            df['Hybrid'][i]=int(df['Hybrid'][i])+int(c[0])
+        elif 'Flash Storage' in a[1]:
+            df['Flash Storage'][i]=int(df['Flash Storage'][i])+int(c[0])
+
+sns.distplot(df['HDD'])
+plt.show()
+
+sns.distplot(df['SSD'])
+plt.show()
+
+sns.distplot(df['Flash Storage'])
+plt.show()
+
+sns.distplot(df['Hybrid'])
+plt.show()
+
+df.drop('Memory',axis=1,inplace=True)
+
+df.corr()['Price']
+
+df['Hybrid'].value_counts()
+
+df['Flash Storage'].value_counts()
+
+df.drop(['Hybrid','Flash Storage'],axis=1,inplace=True)
+
+df.head()
+
+df['Gpu Brand']=0
+for i in range(len(df['Gpu'])):
+    df['Gpu Brand'][i]=df['Gpu'][i].split(' ')[0]
+
+df=df[df['Gpu Brand']!='ARM']
+df.reset_index(inplace=True)
+
+df.drop('Gpu',axis=1,inplace=True)
+df.head()
+
+df['Gpu Brand'].value_counts().plot(kind='bar')
+plt.show()
+
+sns.barplot(df['Gpu Brand'],df['Price'])
+plt.show()
+
+df['OpSys'].value_counts()
+
+sns.barplot(df['OpSys'],df['Price'])
+plt.xticks(rotation='vertical')
+plt.show()
+
+df['OS']=0
+for i in range(len(df['OpSys'])):
+    if 'Windows' in df['OpSys'][i]:
+        df['OS'][i]='Windows'
+    elif 'mac' in df['OpSys'][i]:
+        df['OS'][i]='Mac'
+    elif 'Mac' in df['OpSys'][i]:
+        df['OS'][i]='Mac'
+    else:
+        df['OS'][i]='Others/No Linus/No OS'
+
+df.drop(columns=['OpSys'],inplace=True)
+
+df.head()
+
+sns.barplot(x=df['OS'],y=df['Price'])
+plt.xticks(rotation='vertical')
+plt.show()
+
+df['OS'].value_counts()
+
+df.corr()['Price']
+
+plt.figure(figsize=(10,5))
+sns.heatmap(df.corr(),annot=True)
+plt.show()
+
+sns.distplot(np.log(df['Price']))
+plt.show()
+
+df['Price']=np.log(df['Price'])
+
+df.drop('index',axis=1,inplace=True)
+
+df.head()
+
+X = df.drop(columns=['Price'])
+y = np.log(df['Price'])
+
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.15,random_state=2)
+
+"""### Linear regression"""
+
+step1 = ColumnTransformer(transformers=[
+    ('col_tnf',OneHotEncoder(sparse=False,drop='first'),[0,1,7,10,11])
+    # We will not count price that's why our counting change
+],remainder='passthrough')
+
+step2 = LinearRegression()
+
+pipe = Pipeline([
+    ('step1',step1),
+    ('step2',step2)
+])
+
+pipe.fit(X_train,y_train)
+
+y_pred = pipe.predict(X_test)
+
+print('R2 score',r2_score(y_test,y_pred))
+print('MAE',mean_absolute_error(y_test,y_pred))
