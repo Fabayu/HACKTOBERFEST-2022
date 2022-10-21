@@ -1,0 +1,27 @@
+// Problem link: https://codeforces.com/problemset/problem/41/B
+#include <bits/stdc++.h> 
+using namespace std;
+
+const int MOD = 1e9 + 7;
+const int N = 1e6 + 5;
+
+int a[N], m[N];
+
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL); cout.tie(NULL);
+
+	int n, b; cin >> n >> b;
+	for (int i = 1; i <= n; ++i) cin >> a[i];
+
+	for (int i = n; i >= 0; --i) m[i] = max(m[i + 1], a[i]);
+
+	int ans = b;
+	for (int i = 1; i <= n; ++i) {
+		ans = max(ans, b % a[i] + b / a[i] * m[i + 1]);
+	}
+
+	cout << (n == 1 ? b : ans);
+
+	return 0;
+}
