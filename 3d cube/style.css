@@ -1,0 +1,62 @@
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    height: 100vh;
+    display: flex;
+    margin: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: #282c34;
+  }
+  
+  #container {
+    width: 50vmin;
+    height: 50vmin;
+    perspective: 200vmin;
+  }
+  
+  #cube {
+    position: relative;
+    width: 50vmin;
+    height: 50vmin;
+    transform-style: preserve-3d;
+  }
+  #cube .side {
+    width: 50vmin;
+    height: 50vmin;
+    position: absolute;
+    text-align: center;
+    line-height: 50vmin;
+    font-size: 8vmin;
+    color: #fff;
+    font-family: Helvetica, Arial, serif;
+    opacity: 0.8;
+    transition: transform 1s;
+    border: 2px solid #ccc;
+  }
+  #cube .side.front {
+    background-color: #586ba4;
+    transform: translateZ(25vmin);
+  }
+  #cube .side.back {
+    background-color: #324376;
+    transform: rotateY(180deg) translateZ(25vmin);
+  }
+  #cube .side.left {
+    background-color: #f5dd90;
+    transform: rotateY(-90deg) translateZ(25vmin);
+  }
+  #cube .side.right {
+    background-color: #f68e5f;
+    transform: rotateY(90deg) translateZ(25vmin);
+  }
+  #cube .side.top {
+    background-color: #f76c5e;
+    transform: rotateX(90deg) translateZ(25vmin);
+  }
+  #cube .side.bottom {
+    background-color: #4c8270;
+    transform: rotateX(-90deg) translateZ(25vmin);
+  }
